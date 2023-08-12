@@ -50,13 +50,15 @@ const buildDecoder = async (watchHtml) => {
 
     let decodeFunction = decodeFunctionMatches[0];
 
-    let varNameMatches = decodeFunction.match(/\.split\(\"\"\);([a-zA-Z0-9]+)\./);
+    let varNameMatches = decodeFunction.match(/\.split\(\"\"\);([a-zA-Z0-9$]+)\./);
 
-    if (!varNameMatches) {
+    if (!varNameMatches || !varNameMatches[1]) {
         return null;
     }
+    
+    let variableName = varNameMatches[1].replace('$', '\\$');
 
-    let varDeclaresMatches = jsFileContent.match(new RegExp(`(var ${varNameMatches[1]}={[\\s\\S]+}};)[a-zA-Z0-9]+\\.[a-zA-Z0-9]+\\.prototype`));
+    let varDeclaresMatches = jsFileContent.match(new RegExp(`(var ${variableName}={[\\s\\S]+}};)[a-zA-Z0-9]+\\.[a-zA-Z0-9]+\\.prototype`));
 
     if (!varDeclaresMatches) {
         return null;
